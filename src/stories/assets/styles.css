@@ -1,0 +1,17 @@
+.sbdocs .tagslist {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.sbdocs .tagslist__tag {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.sbdocs .tagslist__tag_status_wip {
+  background-color: #FFB133;
+}

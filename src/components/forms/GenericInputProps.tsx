@@ -7,7 +7,11 @@ export interface GenericInputProps extends React.ComponentPropsWithoutRef<"input
    */
   id?: string,
   /**
-   * The text displayed and read by a screen reader when visiting the control.
+   * The name of the `<input />`.
+   */
+  name?: string,
+  /**
+   * The text displayed on screen or read by a screen reader when visiting the control.
    */
   label: string,
   /**
@@ -17,13 +21,14 @@ export interface GenericInputProps extends React.ComponentPropsWithoutRef<"input
   /**
    * The message displayed when a validation error occurs. Must be self-explanatory to allow easy correction.
    */
-  errorMessage: string,
+  errorMessage?: string,
   /**
    * Marks the input as mandatory.
    */
   required?: boolean,
   /**
-   * Optional text or symbol that will indicate the required status.
+   * Optional text or symbol that will indicate the required status.<br />
+   * WARNING: If you use the `*` symbol to indicate that a field is required, you have to explain it to the user **before** the form.
    */
   requiredText?: string,
   /**
@@ -37,5 +42,9 @@ export interface GenericInputProps extends React.ComponentPropsWithoutRef<"input
   /**
    * Optional `onChange` event that is called  whenever the `<input />` is updated.
    */
-  onChange?: ChangeEventHandler<HTMLInputElement>
+  onChange?: ChangeEventHandler<HTMLInputElement>,
+  /**
+   * Lets the developer specify if and how the browser can automatically fill the field. For a list of accepted values, see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete#values.
+   */
+  autoComplete?: string
 }
