@@ -4,3 +4,7 @@
   align-items: flex-start;
   text-align: start;
 }
+
+.mylib--textinput__required-text {
+  margin-inline-start: 0.5ch;
+}

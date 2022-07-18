@@ -5,5 +5,17 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+    expanded: true,
+    hideNoControlsWarning: true,
+  },
+  options: {
+    storySort: {
+      method: 'configure',
+      includeNames: true,
+      order: [
+        'Forms',
+        'Roadmap',
+      ],
+    },
   },
 }
