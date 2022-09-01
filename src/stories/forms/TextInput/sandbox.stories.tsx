@@ -1,7 +1,6 @@
-// import { useArgs } from '@storybook/client-api';
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import type { ComponentStoryObj, ComponentMeta } from '@storybook/react';
 import React, { useState } from "react";
-import { TextInput } from '../../../components';
+import TextInput, { TextInputProps } from '../../../components/forms/TextInput/TextInput';
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -109,35 +108,24 @@ export default {
   },
 } as ComponentMeta<typeof TextInput>;
 
-// More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof TextInput> = (args) => {
-  // const [{ value }, updateArgs] = useArgs();
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   updateArgs({ value: event.target.value });
-  // }
+const TextfieldWithHooks = (args:TextInputProps) => {
   const [value, setValue] = useState(args.value ?? "");
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   }
-
-  return (
-    <TextInput
-      {...args}
-      onChange={handleChange}
-      value={value}
-    />
-  );
+  return <TextInput onChange={handleChange} value={value} {...args} />
 };
 
-export const Sandbox = Template.bind({});
-// More on args: https://storybook.js.org/docs/react/writing-stories/args
-Sandbox.args = {
-  label: "Label",
-};
-Sandbox.parameters = {
-  docs: {
-    source: {
-      state: "open"
+export const Sandbox: ComponentStoryObj<typeof TextInput> = {
+  render: (args) => <TextfieldWithHooks {...args} />,
+  args: {
+    label: "Label",
+  },
+  parameters: {
+    docs: {
+      source: {
+        state: "open"
+      }
     }
   }
 };
