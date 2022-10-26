@@ -1,4 +1,4 @@
-import type { ComponentStoryObj, ComponentMeta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react';
 import React, { useState } from "react";
 import TextInput, { TextInputProps } from '../../../components/forms/TextInput/TextInput';
 
@@ -106,17 +106,17 @@ export default {
       sort: "alpha",
     },
   },
-} as ComponentMeta<typeof TextInput>;
+} as Meta<typeof TextInput>;
 
 const TextfieldWithHooks = (args:TextInputProps) => {
-  const [value, setValue] = useState(args.value ?? "");
+  const [value, setValue] = useState(args.value ?? '');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   }
-  return <TextInput onChange={handleChange} value={value} {...args} />
+  return <TextInput {...args} onChange={handleChange} value={value} />
 };
 
-export const Sandbox: ComponentStoryObj<typeof TextInput> = {
+export const Sandbox: StoryObj<typeof TextInput> = {
   render: (args) => <TextfieldWithHooks {...args} />,
   args: {
     label: "Label",

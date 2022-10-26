@@ -12,6 +12,7 @@ export const parameters = {
     storySort: {
       method: 'configure',
       includeName: true,
+      order: ['Roadmap', 'Text input', ['Overview', 'Docs', 'Styles', 'Sandbox']]
     },
   },
 }
