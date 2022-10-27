@@ -56,7 +56,7 @@ const TextInput: FunctionComponent<TextInputProps> = ({
   invalid,
   autoComplete,
   ...rest
-}) => {
+}: TextInputProps) => {
   // We make sure the default `id` is unique by using uuidv4
   if (!id) {
     id = `input-${uuidv4()}`;

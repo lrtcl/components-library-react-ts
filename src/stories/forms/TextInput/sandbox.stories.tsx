@@ -1,6 +1,6 @@
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from "@storybook/react";
 import React, { useState } from "react";
-import TextInput, { TextInputProps } from '../../../components/forms/TextInput/TextInput';
+import TextInput, { TextInputProps } from "../../../components/forms/TextInput/TextInput";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
