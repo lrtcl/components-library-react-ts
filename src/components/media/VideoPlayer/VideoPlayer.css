@@ -6,13 +6,17 @@
   width: 100%;
 }
 
+.mylib--videoPlayer__video::cue {
+  font-size: 1.75rem;
+}
+
 .mylib--videoPlayer__controls {
   display: grid;
   grid-template-rows: repeat(2, min-content);
-  grid-template-columns: repeat(3, max-content) minmax(0, 1fr) max-content;
+  grid-template-columns: repeat(3, max-content) minmax(0, 1fr) repeat(2, max-content);
   grid-template-areas:
-    "progress progress progress progress progress"
-    "play     stop     time     .        mute";
+    "progress progress progress progress progress   progress"
+    "play     stop     time     .        fullscreen mute";
   gap: 0.5rem;
 }
 
@@ -30,6 +34,10 @@
 
 .mylib--videoPlayer__time {
   grid-area: time;
+}
+
+.mylib--videoPlayer__fullscreen {
+  grid-area: fullscreen;
 }
 
 .mylib--videoPlayer__mute {

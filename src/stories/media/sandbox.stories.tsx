@@ -14,15 +14,36 @@ export const Sandbox = (args:VideoPlayerProps) => {
   );
 };
 Sandbox.args = {
-  source: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4",
+  sources: [
+    "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4",
+    "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4",
+    "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4"
+  ],
   poster: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg",
-  captions: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt",
+  captions: [
+    {
+      kind: "captions",
+      src: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt",
+      srcLang: "fr",
+      label: "Français",
+      default: false
+    },
+    {
+      kind: "captions",
+      src: "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt",
+      srcLang: "en",
+      label: "English",
+      default: true
+    }
+  ],
   title: "Tears of Steel",
   showTitle: true,
-  playLabel: "Lecture",
-  pauseLabel: "Pause",
-  stopLabel: "Arrêt",
-  progressbarLabel: "Chercher",
-  muteLabel: "Désactiver le son",
-  unmuteLabel: "Activer le son"
+  interfaceLabels: {
+    play: "Lecture",
+    pause: "Pause",
+    stop: "Arrêt",
+    mute: "Désactiver le son",
+    unmute: "Activer le son",
+    progressbar: "Chercher"
+  },
 };

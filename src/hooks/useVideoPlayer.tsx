@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: boolean) => {
+const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
   const [playerState, setPlayerState] = useState({
     isPlaying: false,
     progress: 0,
     currentTime: "00:00",
     duration: "00:00",
-    isMuted: muted
+    isMuted: muted || false,
+    isFullscreen: false
   });
 
   /**
@@ -63,7 +64,7 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
   /**
    * Stop the video
    */
-  const stop = () => {
+  const stopVideo = () => {
     if (videoElement.current) {
       videoElement.current.currentTime = 0;
     }
@@ -120,6 +121,16 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
   }, [playerState.isMuted, videoElement]);
 
   /**
+   * Handle the fullscreen state
+   */
+  const toggleFullscreen = () => {
+    setPlayerState({
+      ...playerState,
+      isFullscreen: !playerState.isFullscreen
+    });
+  }
+
+  /**
    * Handle the video ending event
    */
   const handleOnEnded = () => {
@@ -132,8 +143,9 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
   return {
     playerState,
     togglePlay,
-    stop,
+    stopVideo,
     toggleMute,
+    toggleFullscreen,
     handleOnTimeUpdate,
     handleTimeSelection,
     handleOnLoadedMetadata,
