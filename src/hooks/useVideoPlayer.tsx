@@ -10,7 +10,7 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
   });
 
   /**
-   * Convert duration into time string
+   * Convert time into string
    */
   const convertTimeToString = (time:number) => {
     let minutes = Math.floor(time / 60);
@@ -119,6 +119,16 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
     }
   }, [playerState.isMuted, videoElement]);
 
+  /**
+   * Handle the video ending event
+   */
+  const handleOnEnded = () => {
+    setPlayerState({
+      ...playerState,
+      isPlaying: false
+    });
+  }
+
   return {
     playerState,
     togglePlay,
@@ -126,7 +136,8 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted: 
     toggleMute,
     handleOnTimeUpdate,
     handleTimeSelection,
-    handleOnLoadedMetadata
+    handleOnLoadedMetadata,
+    handleOnEnded
   }
 };
 

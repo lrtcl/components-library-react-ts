@@ -1,0 +1,37 @@
+.mylib--videoPlayer {
+  max-width: 1024px;
+}
+
+.mylib--videoPlayer__video {
+  width: 100%;
+}
+
+.mylib--videoPlayer__controls {
+  display: grid;
+  grid-template-rows: repeat(2, min-content);
+  grid-template-columns: repeat(3, max-content) minmax(0, 1fr) max-content;
+  grid-template-areas:
+    "progress progress progress progress progress"
+    "play     stop     time     .        mute";
+  gap: 0.5rem;
+}
+
+.mylib--videoPlayer__progressbar {
+  grid-area: progress;
+}
+
+.mylib--videoPlayer__play {
+  grid-area: play;
+}
+
+.mylib--videoPlayer__stop {
+  grid-area: stop;
+}
+
+.mylib--videoPlayer__time {
+  grid-area: time;
+}
+
+.mylib--videoPlayer__mute {
+  grid-area: mute;
+}
