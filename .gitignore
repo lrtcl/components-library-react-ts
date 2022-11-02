@@ -8,3 +8,6 @@ yarn.lock
 # Build dir
 dist/
 types/
+
+# Storybook build dir
+storybook-static/

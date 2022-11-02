@@ -87,8 +87,10 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           poster={poster}
           onTimeUpdate={handleOnTimeUpdate}
           onLoadedMetadata={handleOnLoadedMetadata}
-          onEnded={handleOnEnded}
           onClick={togglePlay}
+          onPlay={togglePlay}
+          onPause={togglePlay}
+          onEnded={handleOnEnded}
           preload="metadata"
           playsInline
           crossOrigin="true"
