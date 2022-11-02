@@ -50,18 +50,20 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
   poster,
   captions
 }: VideoPlayerProps) => {
+  const videoPlayerElement = useRef(null);
   const videoElement = useRef(null);
   const {
     playerState,
+    isPlaying,
+    isFullscreen,
     togglePlay,
     stopVideo,
     toggleMute,
     toggleFullscreen,
     handleOnTimeUpdate,
     handleTimeSelection,
-    handleOnLoadedMetadata,
     handleOnEnded
-  } = useVideoPlayer(videoElement, muted);
+  } = useVideoPlayer(videoPlayerElement, videoElement, muted);
   const defaultInterfaceLabels: InterfaceLabels = {
     play: "Play",
     pause: "Pause",
@@ -75,7 +77,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
   interfaceLabels = { ...defaultInterfaceLabels, ...interfaceLabels };
 
   return (
-    <div className="mylib--videoPlayer">
+    <div className="mylib--videoPlayer" ref={videoPlayerElement}>
       {(title && showTitle) && (
         <div className="mylib--videoPlayer__title">{title}</div>
       )}
@@ -86,23 +88,27 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           muted={muted}
           poster={poster}
           onTimeUpdate={handleOnTimeUpdate}
-          onLoadedMetadata={handleOnLoadedMetadata}
-          onClick={togglePlay}
-          onPlay={togglePlay}
-          onPause={togglePlay}
           onEnded={handleOnEnded}
           preload="metadata"
           playsInline
           crossOrigin="true"
         >
-          {sources.map(source => (
+          {sources.map((source, index) => (
             <source
               src={source}
               type={`video/${getExtension(source)}`}
+              key={index}
             />
           ))}
-          {captions && captions.map(caption => (
-            <track kind={caption.kind} src={caption.src} srcLang={caption.srcLang} label={caption.label} default={caption.default} />
+          {captions && captions.map((caption, index) => (
+            <track
+              kind={caption.kind}
+              src={caption.src}
+              srcLang={caption.srcLang}
+              label={caption.label}
+              default={caption.default}
+              key={index}
+            />
           ))}
         </video>
       </div>
@@ -124,7 +130,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           type="button"
           onClick={togglePlay}
         >
-          {playerState.isPlaying ? interfaceLabels.pause : interfaceLabels.play}
+          {isPlaying ? interfaceLabels.pause : interfaceLabels.play}
         </button>
         {/* Stop button */}
         <button
@@ -144,7 +150,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           type="button"
           onClick={toggleFullscreen}
         >
-          {playerState.isFullscreen ? interfaceLabels.quitfullscreen : interfaceLabels.fullscreen}
+          {isFullscreen ? interfaceLabels.quitfullscreen : interfaceLabels.fullscreen}
         </button>
         {/* Mute button */}
         <button

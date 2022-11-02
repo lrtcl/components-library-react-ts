@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
+const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
   const [playerState, setPlayerState] = useState({
-    isPlaying: false,
     progress: 0,
     currentTime: "00:00",
     duration: "00:00",
-    isMuted: muted || false,
-    isFullscreen: false
+    isMuted: muted || false
   });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   /**
    * Convert time into string
    */
-  const convertTimeToString = (time:number) => {
+  const convertTimeToString = (time: number) => {
     let minutes = Math.floor(time / 60);
     let seconds = Math.floor(time - minutes * 60);
     let minutesString: string;
@@ -36,30 +36,56 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?:
   /**
    * Handle the loaded metadata event
    */
-  const handleOnLoadedMetadata = () => {
-    if (videoElement.current) {
-      setPlayerState({
-        ...playerState,
-        duration: convertTimeToString(videoElement.current.duration)
-      });
+  useEffect(() => {
+    function handleOnLoadedMetadata() {
+      if (videoElement.current) {
+        setPlayerState({
+          ...playerState,
+          duration: convertTimeToString(videoElement.current.duration)
+        });
+      }
     }
-  };
+    videoElement.current?.addEventListener('loadeddata', handleOnLoadedMetadata);
+    return () => {
+      videoElement.current?.removeEventListener('loadeddata', handleOnLoadedMetadata);
+    }
+  }, []);
 
   /**
-   * Handle the playing state
+   * Play and pause the video
    */
   const togglePlay = () => {
-    setPlayerState({
-      ...playerState,
-      isPlaying: !playerState.isPlaying
-    });
+    console.log('toggle play');
+
+    setIsPlaying(!isPlaying);
   };
 
   useEffect(() => {
-    if (videoElement.current) {
-      playerState.isPlaying ? videoElement.current.play() : videoElement.current.pause();
+    isPlaying ? videoElement.current?.play() : videoElement.current?.pause();
+  }, [isPlaying, videoElement]);
+
+  useEffect(() => {
+    function handleOnClick() {
+      setIsPlaying((isPlaying) => {
+        if (isPlaying) return false;
+        return true;
+      });
     }
-  }, [playerState.isPlaying, videoElement]);
+    function handleOnPlay() {
+      setIsPlaying(true);
+    }
+    function handleOnPause() {
+      setIsPlaying(false);
+    }
+    videoElement.current?.addEventListener('click', handleOnClick);
+    videoElement.current?.addEventListener('play', handleOnPlay);
+    videoElement.current?.addEventListener('pause', handleOnPause);
+    return () => {
+      videoElement.current?.removeEventListener('click', handleOnClick);
+      videoElement.current?.removeEventListener('play', handleOnPlay);
+      videoElement.current?.removeEventListener('pause', handleOnPause);
+    }
+  }, []);
 
   /**
    * Stop the video
@@ -68,12 +94,12 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?:
     if (videoElement.current) {
       videoElement.current.currentTime = 0;
     }
+    setIsPlaying(false);
     setPlayerState({
       ...playerState,
-      isPlaying: false,
       progress: 0
     });
-  }
+  };
 
   /**
    * Handle the progress update
@@ -87,12 +113,12 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?:
         currentTime: convertTimeToString(videoElement.current.currentTime)
       })
     }
-  }
+  };
 
   /**
    * Handle the manual time selection
    */
-  const handleTimeSelection = (event:React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimeSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const targetProgress = Number(event.target.value);
     if (videoElement.current) {
       videoElement.current.currentTime = videoElement.current.duration * (targetProgress / 100);
@@ -102,7 +128,7 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?:
         currentTime: convertTimeToString(videoElement.current.currentTime)
       });
     }
-  }
+  };
 
   /**
    * Handle the muted state
@@ -124,33 +150,50 @@ const useVideoPlayer = (videoElement: React.RefObject<HTMLVideoElement>, muted?:
    * Handle the fullscreen state
    */
   const toggleFullscreen = () => {
-    setPlayerState({
-      ...playerState,
-      isFullscreen: !playerState.isFullscreen
-    });
-  }
+    if (videoPlayerElement.current) {
+      if (document.fullscreenElement !== null) {
+        // The document is in fullscreen mode
+        document.exitFullscreen();
+      } else {
+        // The document is not in fullscreen mode
+        videoPlayerElement.current.requestFullscreen();
+      }
+    }
+  };
+
+  /**
+   * Add a listener for the onFullcreenChange event
+   */
+  useEffect(() => {
+    function handleOnFullscreenChange() {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+    document.addEventListener('fullscreenchange', handleOnFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleOnFullscreenChange);
+  }, []);
 
   /**
    * Handle the video ending event
    */
   const handleOnEnded = () => {
+    setIsPlaying(false);
     setPlayerState({
-      ...playerState,
-      isPlaying: false
+      ...playerState
     });
-  }
+  };
 
   return {
     playerState,
+    isPlaying,
+    isFullscreen,
     togglePlay,
     stopVideo,
     toggleMute,
     toggleFullscreen,
     handleOnTimeUpdate,
     handleTimeSelection,
-    handleOnLoadedMetadata,
     handleOnEnded
-  }
+  };
 };
 
 export default useVideoPlayer;
