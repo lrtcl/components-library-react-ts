@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Caption } from "../components/media/VideoPlayer/VideoPlayer";
 
-const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean, captions?: Caption[]) => {
+const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMuted, setIsMuted] = useState(muted || false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("00:00");
   const [duration, setDuration] = useState("00:00");
+  const [activeCaption, setActiveCaption] = useState<null | Caption>(null);
 
   /**
    * Convert time into string
@@ -46,7 +47,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     return () => {
       videoElement.current?.removeEventListener('loadeddata', handleOnLoadedMetadata);
     }
-  }, []);
+  }, [videoElement]);
 
   /**
    * Play and pause the video
@@ -81,7 +82,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
       videoElement.current?.removeEventListener('play', handleOnPlay);
       videoElement.current?.removeEventListener('pause', handleOnPause);
     }
-  }, []);
+  }, [videoElement]);
 
   /**
    * Stop the video
@@ -152,7 +153,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     }
     document.addEventListener('fullscreenchange', handleOnFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleOnFullscreenChange);
-  }, []);
+  }, [videoElement]);
 
   /**
    * Toggle a class on the video player when changing the fullscreen status
@@ -163,7 +164,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     } else {
       videoPlayerElement.current?.classList.remove("is-fullscreen");
     }
-  }, [isFullscreen]);
+  }, [isFullscreen, videoElement]);
 
   /**
    * Handle the video ending event
@@ -175,7 +176,30 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
   /**
    * Handle the subtitles
    */
-  console.log(captions);
+  useEffect(() => {
+    if (videoElement.current) {
+      // Hide all subtitles on load
+      for (let i = 0; i < videoElement.current.textTracks.length; i++) {
+        videoElement.current.textTracks[i].mode = 'hidden';
+      }
+    }
+  }, [videoElement]);
+
+  const selectCaption = useCallback((caption: Caption) => {
+    setActiveCaption(caption);
+  }, []);
+
+  useEffect(() => {
+    if (videoElement.current && activeCaption) {
+      for (let i = 0; i < videoElement.current.textTracks.length; i++) {
+        if (videoElement.current.textTracks[i].language === activeCaption.srcLang) {
+          videoElement.current.textTracks[i].mode = 'showing';
+        } else {
+          videoElement.current.textTracks[i].mode = 'hidden';
+        }
+      }
+    }
+  }, [activeCaption, videoElement])
 
   return {
     isPlaying,
@@ -190,7 +214,9 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     duration,
     handleOnTimeUpdate,
     handleTimeSelection,
-    handleOnEnded
+    handleOnEnded,
+    selectCaption,
+    activeCaption
   };
 };
 

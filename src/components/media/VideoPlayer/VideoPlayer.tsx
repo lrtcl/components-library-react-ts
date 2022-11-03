@@ -65,8 +65,10 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
     duration,
     handleOnTimeUpdate,
     handleTimeSelection,
-    handleOnEnded
-  } = useVideoPlayer(videoPlayerElement, videoElement, muted, captions);
+    handleOnEnded,
+    selectCaption,
+    activeCaption
+  } = useVideoPlayer(videoPlayerElement, videoElement, muted);
   const defaultInterfaceLabels: InterfaceLabels = {
     play: "Play",
     pause: "Pause",
@@ -80,91 +82,98 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
   interfaceLabels = { ...defaultInterfaceLabels, ...interfaceLabels };
 
   return (
-    <div className="mylib--videoPlayer" ref={videoPlayerElement}>
-      {(title && showTitle) && (
-        <div className="mylib--videoPlayer__title">{title}</div>
-      )}
-      <div className="mylib--videoPlayer__video-wrapper">
-        <video
-          className="mylib--videoPlayer__video"
-          ref={videoElement}
-          muted={muted}
-          poster={poster}
-          onTimeUpdate={handleOnTimeUpdate}
-          onEnded={handleOnEnded}
-          preload="metadata"
-          playsInline
-          crossOrigin="true"
-        >
-          {sources.map((source, index) => (
-            <source
-              src={source}
-              type={`video/${getExtension(source)}`}
-              key={index}
-            />
-          ))}
-          {captions && captions.map((caption, index) => (
-            <track
-              kind={caption.kind}
-              src={caption.src}
-              srcLang={caption.srcLang}
-              label={caption.label}
-              default={caption.default}
-              key={index}
-            />
-          ))}
-        </video>
-      </div>
-      <div className="mylib--videoPlayer__controls">
-        {/* Progress bar */}
-        <input
-          className="mylib--videoPlayer__progressbar"
-          type="range"
-          min="0"
-          max="100"
-          step="0.01"
-          value={progress}
-          aria-label={interfaceLabels.play}
-          onChange={(e) => handleTimeSelection(e)}
-        />
-        {/* Play button */}
-        <button
-          className="mylib--videoPlayer__button mylib--videoPlayer__play"
-          type="button"
-          onClick={togglePlay}
-        >
-          {isPlaying ? interfaceLabels.pause : interfaceLabels.play}
-        </button>
-        {/* Stop button */}
-        <button
-          className="mylib--videoPlayer__button mylib--videoPlayer__stop"
-          type="button"
-          onClick={stopVideo}
-        >
-          {interfaceLabels.stop}
-        </button>
-        {/* Current time / Duration display */}
-        <div className="mylib--videoPlayer__time">
-          {currentTime} / {duration}
+    <>
+      <div className="mylib--videoPlayer" ref={videoPlayerElement}>
+        {(title && showTitle) && (
+          <div className="mylib--videoPlayer__title">{title}</div>
+        )}
+        <div className="mylib--videoPlayer__video-wrapper">
+          <video
+            className="mylib--videoPlayer__video"
+            ref={videoElement}
+            muted={muted}
+            poster={poster}
+            onTimeUpdate={handleOnTimeUpdate}
+            onEnded={handleOnEnded}
+            preload="metadata"
+            playsInline
+            crossOrigin="true"
+          >
+            {sources.map((source, index) => (
+              <source
+                src={source}
+                type={`video/${getExtension(source)}`}
+                key={index}
+              />
+            ))}
+            {captions && captions.map((caption, index) => (
+              <track
+                kind={caption.kind}
+                src={caption.src}
+                srcLang={caption.srcLang}
+                label={caption.label}
+                default={caption.default}
+                key={index}
+              />
+            ))}
+          </video>
         </div>
-        {/* Fullscreen button */}
-        <button
-          className="mylib--videoPlayer__button mylib--videoPlayer__fullscreen"
-          type="button"
-          onClick={toggleFullscreen}
-        >
-          {isFullscreen ? interfaceLabels.quitfullscreen : interfaceLabels.fullscreen}
-        </button>
-        {/* Mute button */}
-        <button
-          className="mylib--videoPlayer__button mylib--videoPlayer__mute"
-          type="button"
-          onClick={toggleMute}
-        >
-          {isMuted ? interfaceLabels.unmute : interfaceLabels.mute}
-        </button>
+        <div className="mylib--videoPlayer__controls">
+          {/* Progress bar */}
+          <input
+            className="mylib--videoPlayer__progressbar"
+            type="range"
+            min="0"
+            max="100"
+            step="0.01"
+            value={progress}
+            aria-label={interfaceLabels.play}
+            onChange={(e) => handleTimeSelection(e)}
+          />
+          {/* Play button */}
+          <button
+            className="mylib--videoPlayer__button mylib--videoPlayer__play"
+            type="button"
+            onClick={togglePlay}
+          >
+            {isPlaying ? interfaceLabels.pause : interfaceLabels.play}
+          </button>
+          {/* Stop button */}
+          <button
+            className="mylib--videoPlayer__button mylib--videoPlayer__stop"
+            type="button"
+            onClick={stopVideo}
+          >
+            {interfaceLabels.stop}
+          </button>
+          {/* Current time / Duration display */}
+          <div className="mylib--videoPlayer__time">
+            {currentTime} / {duration}
+          </div>
+          {/* Fullscreen button */}
+          <button
+            className="mylib--videoPlayer__button mylib--videoPlayer__fullscreen"
+            type="button"
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? interfaceLabels.quitfullscreen : interfaceLabels.fullscreen}
+          </button>
+          {/* Mute button */}
+          <button
+            className="mylib--videoPlayer__button mylib--videoPlayer__mute"
+            type="button"
+            onClick={toggleMute}
+          >
+            {isMuted ? interfaceLabels.unmute : interfaceLabels.mute}
+          </button>
+        </div>
       </div>
-    </div>
+      <div>
+        {captions && captions.map((caption) => (
+          <button type="button" onClick={() => selectCaption(caption)}>{caption.label}</button>
+        ))}
+      </div>
+    </>
   );
 };
 
