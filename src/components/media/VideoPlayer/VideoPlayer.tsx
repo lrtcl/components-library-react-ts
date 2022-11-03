@@ -13,7 +13,7 @@ type InterfaceLabels = {
   progressbar: string
 };
 
-type Caption = {
+export type Caption = {
   kind: string,
   src: string,
   srcLang: string,
@@ -53,17 +53,20 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
   const videoPlayerElement = useRef<null | HTMLDivElement>(null);
   const videoElement = useRef<null | HTMLVideoElement>(null);
   const {
-    playerState,
     isPlaying,
-    isFullscreen,
     togglePlay,
     stopVideo,
-    toggleMute,
+    isFullscreen,
     toggleFullscreen,
+    isMuted,
+    toggleMute,
+    progress,
+    currentTime,
+    duration,
     handleOnTimeUpdate,
     handleTimeSelection,
     handleOnEnded
-  } = useVideoPlayer(videoPlayerElement, videoElement, muted);
+  } = useVideoPlayer(videoPlayerElement, videoElement, muted, captions);
   const defaultInterfaceLabels: InterfaceLabels = {
     play: "Play",
     pause: "Pause",
@@ -120,7 +123,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           min="0"
           max="100"
           step="0.01"
-          value={playerState.progress}
+          value={progress}
           aria-label={interfaceLabels.play}
           onChange={(e) => handleTimeSelection(e)}
         />
@@ -142,7 +145,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
         </button>
         {/* Current time / Duration display */}
         <div className="mylib--videoPlayer__time">
-          {playerState.currentTime} / {playerState.duration}
+          {currentTime} / {duration}
         </div>
         {/* Fullscreen button */}
         <button
@@ -158,7 +161,7 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
           type="button"
           onClick={toggleMute}
         >
-          {playerState.isMuted ? interfaceLabels.unmute : interfaceLabels.mute}
+          {isMuted ? interfaceLabels.unmute : interfaceLabels.mute}
         </button>
       </div>
     </div>

@@ -1,37 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Caption } from "../components/media/VideoPlayer/VideoPlayer";
 
-const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
-  const [playerState, setPlayerState] = useState({
-    progress: 0,
-    currentTime: "00:00",
-    duration: "00:00",
-    isMuted: muted || false
-  });
+const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean, captions?: Caption[]) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMuted, setIsMuted] = useState(muted || false);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState("00:00");
+  const [duration, setDuration] = useState("00:00");
 
   /**
    * Convert time into string
    */
-  const convertTimeToString = (time: number) => {
+  const convertTimeToString = useCallback((time: number) => {
+    time = Math.floor(time);
+    let hours = Math.floor(time / 3600);
+    time %= 3600;
     let minutes = Math.floor(time / 60);
-    let seconds = Math.floor(time - minutes * 60);
+    let seconds = Math.floor(time % 60);
+    let hoursString: string;
     let minutesString: string;
     let secondsString: string;
 
-    if (minutes < 10) {
-      minutesString = "0" + minutes.toString();
-    } else {
-      minutesString = minutes.toString();
-    }
-    if (seconds < 10) {
-      secondsString = "0" + seconds.toString();
-    } else {
-      secondsString = seconds.toString();
-    }
+    hoursString = hours.toString().padStart(2, "0");
+    minutesString = minutes.toString().padStart(2, "0");
+    secondsString = seconds.toString().padStart(2, "0");
 
-    return (minutesString + ":" + secondsString);
-  };
+    if (hours > 0) {
+      return (hoursString + ":" + minutesString + ":" + secondsString);
+    } else {
+      return (minutesString + ":" + secondsString);
+    }
+  }, []);
 
   /**
    * Handle the loaded metadata event
@@ -39,10 +39,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
   useEffect(() => {
     function handleOnLoadedMetadata() {
       if (videoElement.current) {
-        setPlayerState({
-          ...playerState,
-          duration: convertTimeToString(videoElement.current.duration)
-        });
+        setDuration(convertTimeToString(videoElement.current?.duration));
       }
     }
     videoElement.current?.addEventListener('loadeddata', handleOnLoadedMetadata);
@@ -55,7 +52,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    * Play and pause the video
    */
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+    setIsPlaying(isPlaying => !isPlaying);
   };
 
   useEffect(() => {
@@ -68,10 +65,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
 
   useEffect(() => {
     function handleOnClick() {
-      setIsPlaying((isPlaying) => {
-        if (isPlaying) return false;
-        return true;
-      });
+      setIsPlaying(isPlaying => !isPlaying);
     }
     function handleOnPlay() {
       setIsPlaying(true);
@@ -97,10 +91,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
       videoElement.current.currentTime = 0;
     }
     setIsPlaying(false);
-    setPlayerState({
-      ...playerState,
-      progress: 0
-    });
+    setProgress(0);
   };
 
   /**
@@ -108,12 +99,9 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    */
   const handleOnTimeUpdate = () => {
     if (videoElement.current) {
-      const progress = (videoElement.current.currentTime / videoElement.current.duration) * 100;
-      setPlayerState({
-        ...playerState,
-        progress,
-        currentTime: convertTimeToString(videoElement.current.currentTime)
-      })
+      const currentProgress = (videoElement.current.currentTime / videoElement.current.duration) * 100;
+      setProgress(currentProgress);
+      setCurrentTime(convertTimeToString(videoElement.current.currentTime));
     }
   };
 
@@ -124,11 +112,8 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     const targetProgress = Number(event.target.value);
     if (videoElement.current) {
       videoElement.current.currentTime = videoElement.current.duration * (targetProgress / 100);
-      setPlayerState({
-        ...playerState,
-        progress: targetProgress,
-        currentTime: convertTimeToString(videoElement.current.currentTime)
-      });
+      setProgress(targetProgress);
+      setCurrentTime(convertTimeToString(videoElement.current.currentTime));
     }
   };
 
@@ -136,17 +121,14 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    * Handle the muted state
    */
   const toggleMute = () => {
-    setPlayerState({
-      ...playerState,
-      isMuted: !playerState.isMuted
-    });
+    setIsMuted(isMuted => !isMuted);
   };
 
   useEffect(() => {
     if (videoElement.current) {
-      playerState.isMuted ? videoElement.current.muted = true : videoElement.current.muted = false;
+      isMuted ? videoElement.current.muted = true : videoElement.current.muted = false;
     }
-  }, [playerState.isMuted, videoElement]);
+  }, [isMuted, videoElement]);
 
   /**
    * Handle the fullscreen state
@@ -188,19 +170,24 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    */
   const handleOnEnded = () => {
     setIsPlaying(false);
-    setPlayerState({
-      ...playerState
-    });
   };
 
+  /**
+   * Handle the subtitles
+   */
+  console.log(captions);
+
   return {
-    playerState,
     isPlaying,
-    isFullscreen,
     togglePlay,
     stopVideo,
-    toggleMute,
+    isFullscreen,
     toggleFullscreen,
+    isMuted,
+    toggleMute,
+    progress,
+    currentTime,
+    duration,
     handleOnTimeUpdate,
     handleTimeSelection,
     handleOnEnded
