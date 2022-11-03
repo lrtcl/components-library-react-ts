@@ -1,6 +1,6 @@
 import type { StoryObj, Meta } from "@storybook/react";
 import React from "react";
-import VideoPlayer, { VideoPlayerProps } from "../../components/media/VideoPlayer/VideoPlayer";
+import VideoPlayer, { VideoPlayerProps } from "../../../components/media/VideoPlayer/VideoPlayer";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -42,6 +42,8 @@ Sandbox.args = {
     play: "Lecture",
     pause: "Pause",
     stop: "Arrêt",
+    fullscreen: "Plein écran",
+    quitfullscreen: "Quitter le plein écran",
     mute: "Désactiver le son",
     unmute: "Activer le son",
     progressbar: "Chercher"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, videoElement: React.RefObject<HTMLVideoElement>, muted?: boolean) => {
   const [playerState, setPlayerState] = useState({
@@ -31,7 +31,7 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     }
 
     return (minutesString + ":" + secondsString);
-  }
+  };
 
   /**
    * Handle the loaded metadata event
@@ -55,13 +55,15 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    * Play and pause the video
    */
   const togglePlay = () => {
-    console.log('toggle play');
-
     setIsPlaying(!isPlaying);
   };
 
   useEffect(() => {
-    isPlaying ? videoElement.current?.play() : videoElement.current?.pause();
+    if (isPlaying && (videoElement.current?.paused || videoElement.current?.ended)) {
+      videoElement.current?.play();
+    } else if (!isPlaying && !videoElement.current?.paused) {
+      videoElement.current?.pause();
+    }
   }, [isPlaying, videoElement]);
 
   useEffect(() => {
@@ -150,14 +152,12 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
    * Handle the fullscreen state
    */
   const toggleFullscreen = () => {
-    if (videoPlayerElement.current) {
-      if (document.fullscreenElement !== null) {
-        // The document is in fullscreen mode
-        document.exitFullscreen();
-      } else {
-        // The document is not in fullscreen mode
-        videoPlayerElement.current.requestFullscreen();
-      }
+    if (document.fullscreenElement !== null) {
+      // The document is in fullscreen mode
+      document.exitFullscreen();
+    } else {
+      // The document is not in fullscreen mode
+      videoPlayerElement.current?.requestFullscreen();
     }
   };
 
@@ -171,6 +171,17 @@ const useVideoPlayer = (videoPlayerElement: React.RefObject<HTMLDivElement>, vid
     document.addEventListener('fullscreenchange', handleOnFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleOnFullscreenChange);
   }, []);
+
+  /**
+   * Toggle a class on the video player when changing the fullscreen status
+   */
+  useEffect(() => {
+    if (isFullscreen) {
+      videoPlayerElement.current?.classList.add("is-fullscreen");
+    } else {
+      videoPlayerElement.current?.classList.remove("is-fullscreen");
+    }
+  }, [isFullscreen]);
 
   /**
    * Handle the video ending event

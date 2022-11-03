@@ -2,6 +2,10 @@
   max-width: 1024px;
 }
 
+.mylib--videoPlayer.is-fullscreen {
+  color: white;
+}
+
 .mylib--videoPlayer__video {
   width: 100%;
 }

@@ -50,8 +50,8 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
   poster,
   captions
 }: VideoPlayerProps) => {
-  const videoPlayerElement = useRef(null);
-  const videoElement = useRef(null);
+  const videoPlayerElement = useRef<null | HTMLDivElement>(null);
+  const videoElement = useRef<null | HTMLVideoElement>(null);
   const {
     playerState,
     isPlaying,
@@ -163,6 +163,6 @@ const VideoPlayer: FunctionComponent<VideoPlayerProps> = ({
       </div>
     </div>
   );
-}
+};
 
 export default VideoPlayer;
